@@ -11,7 +11,7 @@
   "marketApi": {
     "enabled": true,
     "url": "https://market.main.cs2skin.com/api/items",
-    "token": "PUT_YOUR_BEARER_TOKEN_HERE",
+    "token": "Bearer token",
     "timeoutMs": 15000
   }
 }
