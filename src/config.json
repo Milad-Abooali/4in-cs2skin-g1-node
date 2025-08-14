@@ -1,0 +1,17 @@
+{
+  "port": 8080,
+  "cors": {
+    "enabled": true,
+    "origins": [
+      "*"
+    ]
+  },
+  "chainSecret": "dev-secret-change-me",
+  "logIncoming": true,
+  "marketApi": {
+    "enabled": true,
+    "url": "https://market.main.cs2skin.com/api/items",
+    "token": "PUT_YOUR_BEARER_TOKEN_HERE",
+    "timeoutMs": 15000
+  }
+}
