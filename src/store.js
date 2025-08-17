@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const store = {
   bots: [],
   cases: [],
+  casesImpacted: {},
   items: [],
   battles: {},
   market_items: [

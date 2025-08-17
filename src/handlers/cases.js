@@ -60,6 +60,10 @@ module.exports = async function (ctx, payload) {
   // casesById["1"]                  -> the case with id "1"
   // casesById["1"].items["7"]       -> item with id "7" inside case "1"
 
+  console.log('casesById', casesById);
+
+  store.casesImpacted = casesById;
+
   return casesById;
 };
 

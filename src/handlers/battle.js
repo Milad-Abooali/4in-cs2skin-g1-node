@@ -1,7 +1,12 @@
 const store = require('../store');
 const axios = require('axios');
 const path = require("path");
+const getCases = require('./cases');
 
+if ( Object.keys(store.casesImpacted).length < 1 ) {
+  console.log( "Impact Cases ..." )
+  getCases().then(r => console.log("Cases Impacted.", store.casesImpacted) );
+}
 let battle = {}
 
 battle = {
@@ -22,7 +27,9 @@ battle = {
   "players":[],
   "bots":[],
   "status": "foo",
-  "summery": {}
+  "summery": {
+    steps:{}
+  }
 };
 
 async function newBattle(ctx, data) {
@@ -50,26 +57,41 @@ async function newBattle(ctx, data) {
         }
     );
 
+    // Options
+    battle.options = data.options;
+
+    // Cases
+    battle.cases = data.cases;
+
+    // Fill Player & Slot
+    battle.slots.s1 = {"id":resp.data.data.profile.id, "display_name":resp.data.data.profile.display_name,"type":"player"};
+    battle.createdBy = resp.data.data.profile.id;
+    battle.players.push(resp.data.data.profile.id);
+
     // Handel Cases
-    let caseCost = 0;
-    let caseCount = 0;
-    for (const i in data.cases.keys()) {
-      console.log(data.cases[i]);
+    let caseCost = data.cases.flatMap(Object.values).reduce((a, b) => a + b, 0);
+    let caseCount = data.cases.flatMap(Object.values).reduce((a, b) => a + b, 0);
+
+    for (const i in battle.cases) {
+
+      // Get Cases
+      let iID = Object.keys(battle.cases[i])[0];
+      let iCount = Object.values(battle.cases[i])[0];
+
+      //counter
+      caseCount = caseCount+iCount;
+
+      console.log( store.casesImpacted );
+
+
       battle.summery.steps[`r${i}`] = [];
     }
-
 
     // Check Balance
 
     // Cases Count
 
-    // Options
-    battle.options = data.options;
-    battle.cases = data.cases;
 
-    battle.slots.s1 = {"id":resp.data.data.profile.id, "display_name":resp.data.data.profile.display_name,"type":"player"};
-    battle.createdBy = resp.data.data.profile.id;
-    battle.players.push(resp.data.data.profile.id);
     return battle;
   } catch (error) {
     if (error.response) {
