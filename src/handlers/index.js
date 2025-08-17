@@ -2,7 +2,7 @@
 const getBots = require('./bots');
 const getCases = require('./cases');
 const getItems = require('./items');
-const newBattle = require('./battle');
+const { newBattle } = require('./battle');
 const { getMarketItems, refreshMarketItems } = require('./market');
 module.exports = {
   'get/bots': getBots,

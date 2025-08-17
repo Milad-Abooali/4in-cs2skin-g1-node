@@ -123,10 +123,5 @@ const store = {
     {"id":"180","market_hash_name":"test","cat":"Emerlad"}
   ],
   market_items_loaded_at: null,
-  newBattle: (battle)=>{
-    console.log(`test`);
-
-    return battle;
-  }
 };
 module.exports = store;

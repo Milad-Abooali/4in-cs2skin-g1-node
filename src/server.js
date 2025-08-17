@@ -50,7 +50,7 @@ wss.on('connection', (ws) => {
       const result = await handler(ctx, msg.data || {});
       response.ok(socket, result);
     } catch (err) {
-      response.err(socket,'UNKNOWN_ERROR', 1027, err.message);
+      response.err(socket,err.type, err.error, err.data);
     }
   });
 
