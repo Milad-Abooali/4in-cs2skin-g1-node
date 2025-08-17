@@ -22,22 +22,8 @@ battle = {
   "players":[],
   "bots":[],
   "status": "foo",
-  "summery": {
-    "steps": { },
-    "winners": [],
-    "prizes": []
-  },
-  "createdAt": null,
-  "createdBy": null,
-  "he":{
-    "payIn": 0,
-    "payOut": 0,
-    "rate": 0,
-    "balance": 0
-  },
-  "pfair": { }
+  "summery": {}
 };
-
 
 async function newBattle(ctx, data) {
   if (!ctx.config.umApi || !ctx.config.umApi.enabled) throw Object.assign(new Error('marketApi disabled in config'), { code: 503 });
