@@ -1,4 +1,8 @@
 {
+  "token": "48fb1265be004e5bdb304026558bed2",
+  "coreToken":  "g1-da2263ce6da497e251c588635bfb6d6a5be0cbc2b70cfc104655bdb3040be276",
+  "CoreURL": "core.main.cs2skin.com:50051",
+  "version": "0.1.0",
   "port": 8080,
   "cors": {
     "enabled": true,
@@ -12,6 +16,13 @@
     "enabled": true,
     "url": "https://market.main.cs2skin.com/api/items",
     "token": "token",
+    "timeoutMs": 15000
+  },
+  "umApi": {
+    "enabled": true,
+    "url": "https://um.main.cs2skin.com/web",
+    "token": "4fb1c6d6a5be06d65be004e2558bep2r",
+    "xKey": "1304025bdb3066dfb5c402c63ce1c02bbc6da41",
     "timeoutMs": 15000
   }
 }

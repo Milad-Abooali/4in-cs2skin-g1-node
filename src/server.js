@@ -1,4 +1,3 @@
-
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
@@ -11,6 +10,7 @@ const hub = require('./lib/wsHub');
 const cfgPath = path.join(__dirname, 'config.json');
 const config = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
 const app = express();
+const response = require('./lib/response');
 if (config.cors && config.cors.enabled) {
   app.use(cors({ origin: config.cors.origins || ['*'] }));
 }
@@ -20,30 +20,63 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 wss.on('connection', (ws) => {
   hub.register(ws);
+  let authenticated = true;
+
+  const socket = {
+    ws: ws,
+    reqId: "",
+    action: ""
+  }
+
   ws.on('message', async (raw) => {
+    if(!authenticated) return;
     let msg;
     try { msg = JSON.parse(raw); } catch (e) {
-      ws.send(JSON.stringify(fail({ code: 400, message: 'Invalid JSON' }, config.chainSecret)));
+      response.err(socket,'INVALID_JSON_BODY', 1002);
       return;
     }
     if (config.logIncoming) console.log('WS IN:', msg);
-    const action = msg.action;
+    const action = msg.type;
     const reqId = msg.reqId || null;
     const handler = routes[action];
     const ctx = { config, broadcast: hub.broadcast };
+    socket.reqId = reqId;
+    socket.action = action;
     try {
       if (!handler) {
-        const resp = fail({ code: 404, message: 'Unknown action' }, config.chainSecret);
-        resp.reqId = reqId; ws.send(JSON.stringify(resp)); return;
+        response.err(socket,'METHOD_NOT_ALLOWED', 1004);
+        return;
       }
-      const result = await handler(ctx, msg.payload || {});
-      result.reqId = reqId; ws.send(JSON.stringify(result));
+      const result = await handler(ctx, msg.data || {});
+      response.ok(socket, result);
     } catch (err) {
-      const resp = fail({ code: 500, message: err.message || String(err) }, config.chainSecret);
-      resp.reqId = reqId; ws.send(JSON.stringify(resp));
+      response.err(socket,'UNKNOWN_ERROR', 1027, err.message);
     }
   });
+
+  // Handshake
+  if(!authenticated) {
+    ws.once('message', (raw) => {
+    socket.reqId = 0;
+    socket.action= `handshake`;
+
+    const token = raw.toString().trim();
+    if (config.token===token) {
+      response.ok(socket, {
+        "apiVersion": config.version,
+        "serverTime": new Date().toISOString().split('.')[0] + "Z"
+      });
+      authenticated = true;
+    } else {
+      response.err(socket, 'INVALID_APP_TOKEN', 1001);
+      ws.close();
+    }
+  });
+  }
+
 });
 const port = Number(process.env.PORT || config.port || 8080);
 server.listen(port, () => console.log(`WS Mock on :${port} (path: /ws)`));
+
+
 module.exports = { broadcast: hub.broadcast, wss };

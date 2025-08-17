@@ -1,5 +1,25 @@
+const grpcClient = require('../lib/gRPC');
 const store = require('../store');
-const { ok } = require('../lib/envelope');
+const path = require("path");
+const fs = require("fs");
+const cfgPath = path.join(__dirname, '../config.json');
+const config = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+const { protoToObject } = require('../lib/protoUtils');
+
+// Get Bots
+const query  = `select * from cases`;
+grpcClient.Query({ token: config.coreToken, query }, (err, response) => {
+  if (err) {
+    console.error("gRPC error:", err);
+    return;
+  }
+  if (response.status === "ok") {
+    const responseArray = protoToObject(response.data);
+    store.cases = responseArray.rows;
+    console.log('gRPC - get cases ', responseArray.count)
+  }
+});
+
 
 module.exports = async function (ctx, payload) {
   const cases = store.cases;
@@ -40,5 +60,6 @@ module.exports = async function (ctx, payload) {
   // casesById["1"]                  -> the case with id "1"
   // casesById["1"].items["7"]       -> item with id "7" inside case "1"
 
-  return ok(casesById, ctx.config.chainSecret);
+  return casesById;
 };
+
